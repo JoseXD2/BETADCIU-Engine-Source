@@ -30,10 +30,10 @@ import flixel.graphics.FlxGraphic;
 import openfl.Lib;
 import lime.utils.Assets;
 
-#if desktop
+
 import sys.io.File;
 import sys.FileSystem;
-#end
+
 
 using StringTools;
 import Shaders;
@@ -601,7 +601,7 @@ class Stage extends MusicBeatState
 				isCustomStage = true;
 				trace('using a custom stage');
 
-				if(!FileSystem.exists(Paths.getPreloadPath('stages/' + curStage + '.json')) && !FileSystem.exists(Paths.modFolders('stages/' + curStage + '.json')))
+				if(!FileSystem.exists(SUtil.getPath() + Paths.getPreloadPath('stages/' + curStage + '.json')) && !FileSystem.exists(Paths.modFolders('stages/' + curStage + '.json')))
 				{
 					trace('oops we usin the default stage');
 					curStage = 'stage'; //defaults to stage if we can't find the path
