@@ -205,6 +205,10 @@ class VitorState extends MusicBeatState
 			add(daText2);
 		}
 
+		#if android
+                addVirtualPad(UP_DOWN, A_B);
+                #end
+			
 		super.create();
 	}
 
