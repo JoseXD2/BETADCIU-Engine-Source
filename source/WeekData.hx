@@ -1,9 +1,9 @@
 package;
 
-#if desktop
+
 import sys.io.File;
 import sys.FileSystem;
-#end
+
 import lime.utils.Assets;
 import openfl.utils.Assets as OpenFlAssets;
 import haxe.Json;
@@ -93,10 +93,10 @@ class WeekData {
 		weeksList = [];
 		weeksLoaded.clear();
 
-		#if desktop
+		
 		var disabledMods:Array<String> = [];
-		var modsListPath:String = 'modsList.txt';
-		var directories:Array<String> = [Paths.mods(), Paths.getPreloadPath()];
+		var modsListPath:String = SUtil.getPath() + 'modsList.txt';
+		var directories:Array<String> = [Paths.mods(), SUtil.getPath() + Paths.getPreloadPath()];
 		var originalLength:Int = directories.length;
 
 		switch(menuNo)
@@ -114,7 +114,7 @@ class WeekData {
 					case 4: suf = '-vitor'; //Vitor Menu
 					case 5: suf = '-guest'; //Other BETADCIU creators menu.
 				}
-				#if desktop
+				
 				var directory:String = Paths.modFolders('BETADCIU') + '/weeks/';
 				var i:Int = 0;
 				var curI:Int = 0;
@@ -149,7 +149,7 @@ class WeekData {
 							i++;
 					}
 				}
-				#end
+				
 			}
 		}
 
@@ -194,7 +194,7 @@ class WeekData {
 		var originalLength:Int = directories.length;
 		#end
 
-		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getPreloadPath('weeks/weekList.txt'));
+		var sexList:Array<String> = CoolUtil.coolTextFile(SUtil.getPath() + Paths.getPreloadPath('weeks/weekList.txt'));
 		for (i in 0...sexList.length) {
 			for (j in 0...directories.length) {
 				var fileToCheck:String = directories[j] + 'weeks/' + sexList[i] + '.json';
@@ -203,11 +203,11 @@ class WeekData {
 					if(week != null) {
 						var weekFile:WeekData = new WeekData(week);
 
-						#if desktop
+						
 						if(j >= originalLength) {
 							weekFile.folder = directories[j].substring(Paths.mods().length, directories[j].length-1);
 						}
-						#end
+						
 
 						if(weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay))) {
 							weeksLoaded.set(sexList[i], weekFile);
@@ -218,7 +218,7 @@ class WeekData {
 			}
 		}
 
-		#if desktop
+		
 		for (i in 0...directories.length) {
 			var directory:String = directories[i] + 'weeks/';
 			if(FileSystem.exists(directory)) {
@@ -246,7 +246,7 @@ class WeekData {
 				}
 			}
 		}
-		#end
+		
 	}
 
 
@@ -260,9 +260,9 @@ class WeekData {
 				var weekFile:WeekData = new WeekData(week);
 				if(i >= originalLength)
 				{
-					#if desktop
+					
 					weekFile.folder = directory.substring(Paths.mods().length, directory.length-1);
-					#end
+					
 				}
 				if((PlayState.isStoryMode && !weekFile.hideStoryMode) || (!PlayState.isStoryMode && !weekFile.hideFreeplay))
 				{
@@ -275,15 +275,15 @@ class WeekData {
 
 	private static function getWeekFile(path:String):WeekFile {
 		var rawJson:String = null;
-		#if desktop
+		
 		if(FileSystem.exists(path)) {
 			rawJson = File.getContent(path);
 		}
-		#else
+		
 		if(OpenFlAssets.exists(path)) {
 			rawJson = Assets.getText(path);
 		}
-		#end
+		
 
 		if(rawJson != null && rawJson.length > 0) {
 			return cast Json.parse(rawJson);
