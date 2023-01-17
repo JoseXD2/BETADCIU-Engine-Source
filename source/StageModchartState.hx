@@ -4,7 +4,7 @@
 import openfl.display3D.textures.VideoTexture;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
-#if desktop
+
 import flixel.tweens.FlxEase;
 import openfl.filters.ShaderFilter;
 import openfl.Lib;
@@ -39,11 +39,11 @@ import flixel.math.FlxRect;
 import animateatlas.AtlasFrameMaker;
 import ModchartState;
 
-#if desktop
+
 import Sys;
 import sys.io.File;
 import sys.FileSystem;
-#end
+
 
 using StringTools;
 import Shaders;
@@ -96,7 +96,7 @@ class StageModchartState
 		return Function_Continue;
 	}
 
-	#if desktop
+	
 	function resultIsAllowed(leLua:State, leResult:Null<Int>) { //Makes it ignore warnings
 		switch(Lua.type(leLua, leResult)) {
 			case Lua.LUA_TNIL | Lua.LUA_TBOOLEAN | Lua.LUA_TNUMBER | Lua.LUA_TSTRING | Lua.LUA_TTABLE:
@@ -104,7 +104,7 @@ class StageModchartState
 		}
 		return false;
 	}
-	#end
+	
 
 	static function toLua(l:State, val:Any):Bool {
 		switch (Type.typeof(val)) {
@@ -251,7 +251,7 @@ class StageModchartState
 	}
 
 	public function luaTrace(text:String, ignoreCheck:Bool = false, deprecated:Bool = false, ?color:FlxColor = FlxColor.WHITE) {
-		#if desktop
+		
 		if (preloading) //otherwise it'll warn a lot for objects with scales
 			return;
 
@@ -262,10 +262,10 @@ class StageModchartState
 			PlayState.instance.addTextToDebug(text, color);
 			trace(text);
 		}
-		#end
+		
 	}
 
-	#if desktop
+	
 	public function getBool(variable:String) {
 		var result:String = null;
 		Lua.getglobal(lua, variable);
@@ -280,7 +280,7 @@ class StageModchartState
 		//trace('variable: ' + variable + ', ' + result);
 		return (result == 'true');
 	}
-	#end
+	
 
 	function getActorByName(id:String):Dynamic
 	{
@@ -417,8 +417,8 @@ class StageModchartState
 		Lua_helper.add_callback(lua, "closeLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) { //would be dope asf. 
 			var cervix = luaFile + ".lua";
 			var doPush = false;
-			if(FileSystem.exists(FileSystem.absolutePath("assets/shared/"+cervix))) {
-				cervix = FileSystem.absolutePath("assets/shared/"+cervix);
+			if(FileSystem.exists(FileSystem.absolutePath(SUtil.getPath() + "assets/shared/"+cervix))) {
+				cervix = FileSystem.absolutePath(SUtil.getPath() + "assets/shared/"+cervix);
 				doPush = true;
 			}
 			else if (FileSystem.exists(Paths.modFolders(cervix)))
@@ -427,7 +427,7 @@ class StageModchartState
 				doPush = true;
 			}
 			else {
-				cervix = Paths.getPreloadPath(cervix);
+				cervix = SUtil.getPath() + Paths.getPreloadPath(cervix);
 				if(FileSystem.exists(cervix)) {
 					doPush = true;
 				}
@@ -511,7 +511,7 @@ class StageModchartState
 				doPush = true;
 			}
 			else {
-				cervix = Paths.getPreloadPath(cervix);
+				cervix = SUtil.getPath() + Paths.getPreloadPath(cervix);
 				if(FileSystem.exists(cervix)) {
 					doPush = true;
 				}
@@ -572,7 +572,7 @@ class StageModchartState
 				}
 			}
 			#else
-			cervix = Paths.getPreloadPath(cervix);
+			cervix = SUtil.getPath() + Paths.getPreloadPath(cervix);
 			if(Assets.exists(cervix)) {
 				doPush = true;
 			}
@@ -619,7 +619,7 @@ class StageModchartState
 				doPush = true;
 			}
 			else {
-				cervix = Paths.getPreloadPath(cervix);
+				cervix = SUtil.getPath() + Paths.getPreloadPath(cervix);
 				if(FileSystem.exists(cervix)) {
 					doPush = true;
 				}
@@ -2523,10 +2523,10 @@ class StageModchartState
 
 					rawPic = Paths.currentTrackedAssets.get(image);
 
-					if (FileSystem.exists(FileSystem.absolutePath("assets/shared/images/"+image+".xml")))
-						rawXml = File.getContent(FileSystem.absolutePath("assets/shared/images/"+image+".xml"));
+					if (FileSystem.exists(FileSystem.absolutePath(SUtil.getPath() + "assets/shared/images/"+image+".xml")))
+						rawXml = File.getContent(FileSystem.absolutePath(SUtil.getPath() + "assets/shared/images/"+image+".xml"));
 					else
-						rawXml = File.getContent(Paths.xmlNew('images/' + image));
+						rawXml = File.getContent(SUtil.getPath() + Paths.xmlNew('images/' + image));
 
 					leSprite.frames = FlxAtlasFrames.fromSparrow(rawPic,rawXml);
 				}
@@ -3470,4 +3470,4 @@ class StageModchartState
 		return PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance;
 	}
 }
-#end
+	
