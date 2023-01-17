@@ -68,17 +68,17 @@ class Replay
 		var data:String = Json.stringify(json);
 
 		#if sys
-		File.saveContent("assets/replays/replay-" + PlayState.SONG.song + "-time" + Date.now().getTime() + ".kadeReplay", data);
+		SUtil.saveContent("assets/replays/replay-" + PlayState.SONG.song + "-time" + Date.now().getTime() + ".kadeReplay", data);
 		#end
 	}
 
 	public function LoadFromJSON()
 	{
 		#if sys
-		trace('loading ' + Sys.getCwd() + 'assets/replays/' + path + ' replay...');
+		trace('loading ' + SUtil.getPath()() + 'assets/replays/' + path + ' replay...');
 		try
 		{
-			var repl:ReplayJSON = cast Json.parse(File.getContent(Sys.getCwd() + "assets/replays/" + path));
+			var repl:ReplayJSON = cast Json.parse(File.getContent(SUtil.getPath() + "assets/replays/" + path));
 			replay = repl;
 		}
 		catch(e)
