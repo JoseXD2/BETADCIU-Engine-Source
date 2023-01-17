@@ -88,10 +88,10 @@ import DialogueBoxPsych;
 import Shaders;
 
 //detected
-#if desktop
+
 import LuaClass.LuaCamera;
 import LuaClass.LuaNote;
-#end
+
 
 using StringTools;
 
@@ -571,9 +571,9 @@ class PlayState extends MusicBeatState
 			case 'philly-nice': songLowercase = 'philly';
 		}
 		
-		#if windows
-		executeModchart = FileSystem.exists(Paths.lua(songLowercase  + "/modchart" + suf));
-		#end
+		
+		executeModchart = FileSystem.exists(SUtil.getPath() + Paths.lua(songLowercase  + "/modchart" + suf));
+		
 		#if !cpp
 		executeModchart = false; // FORCE disable for non cpp targets
 		#end
@@ -720,10 +720,10 @@ class PlayState extends MusicBeatState
 
 		gfVersion = gfCheck;
 
-		if (FileSystem.exists(Paths.txt(songLowercase  + "/arrowSwitches" + suf)) && !(isBETADCIU && storyDifficulty == 5))
+		if (FileSystem.exists(SUtil.getPath() + Paths.txt(songLowercase  + "/arrowSwitches" + suf)) && !(isBETADCIU && storyDifficulty == 5))
 			changeArrows = true;
 
-		if (FileSystem.exists(Paths.txt(songLowercase  + "/preload" + suf)))
+		if (FileSystem.exists(SUtil.getPath() + Paths.txt(songLowercase  + "/preload" + suf)))
 		{
 			var characters:Array<String> = CoolUtil.coolTextFile2(Paths.txt(songLowercase  + "/preload" + suf));
 
@@ -1234,15 +1234,15 @@ class PlayState extends MusicBeatState
 		trace('starting');
 
 		// SONG SPECIFIC SCRIPTS
-		#if desktop
+		
 		var filesPushed:Array<String> = [];
-		var foldersToCheck:Array<String> = [Paths.getPreloadPath('data/' + Paths.formatToSongPath(SONG.song) + '/')];
+		var foldersToCheck:Array<String> = [SUtil.getPath() + Paths.getPreloadPath('data/' + Paths.formatToSongPath(SONG.song) + '/')];
 
-		#if desktop
+		
 		foldersToCheck.insert(0, Paths.mods('data/' + Paths.formatToSongPath(SONG.song) + '/'));
 		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/data/' + Paths.formatToSongPath(SONG.song) + '/'));
-		#end
+		
 
 		for (folder in foldersToCheck)
 		{
@@ -1262,17 +1262,17 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		#end
+		
 
-		#if desktop
+		
 		var filesPushed:Array<String> = [];
-		var foldersToCheck:Array<String> = [Paths.getPreloadPath('scripts/')];
+		var foldersToCheck:Array<String> = [SUtil.getPath() + Paths.getPreloadPath('scripts/')];
 
-		#if desktop
+		
 		foldersToCheck.insert(0, Paths.mods('scripts/'));
 		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/scripts/'));
-		#end
+		
 
 		for (folder in foldersToCheck)
 		{
@@ -1288,9 +1288,9 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		#end
+		
 
-		#if desktop
+		
 		for (notetype in noteTypeMap.keys())
 		{
 			var luaToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.lua');
@@ -1298,7 +1298,7 @@ class PlayState extends MusicBeatState
 				luaArray.push(new ModchartState(luaToLoad));
 			else
 			{
-				luaToLoad = Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
+				luaToLoad = SUtil.getPath() + Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
 				if(FileSystem.exists(luaToLoad))
 				{
 					luaArray.push(new ModchartState(luaToLoad));
@@ -1315,7 +1315,7 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				luaToLoad = Paths.getPreloadPath('custom_events/' + event + '.lua');
+				luaToLoad = SUtil.getPath() + Paths.getPreloadPath('custom_events/' + event + '.lua');
 				if(FileSystem.exists(luaToLoad))
 				{
 					luaArray.push(new ModchartState(luaToLoad));
@@ -1329,7 +1329,7 @@ class PlayState extends MusicBeatState
 			}
 			#end
 		}
-		#end
+		
 		noteTypeMap.clear();
 		noteTypeMap = null;
 		eventPushedMap.clear();
@@ -1366,6 +1366,11 @@ class PlayState extends MusicBeatState
 		if (Stage.isCustomStage && Stage.luaArray.length >= 1)
 			Stage.callOnLuas('onCreatePost', []);	
 
+			#if android
+                addAndroidControls();
+                androidControls.visible = true;
+                #end
+			
 		if ((isStoryMode || showCutscene))
 		{
 			switch (songLowercase)
@@ -1777,11 +1782,11 @@ class PlayState extends MusicBeatState
 	}
 
 	public function setOnLuas(variable:String, arg:Dynamic) {
-		#if windows
+		
 		for (i in 0...luaArray.length) {
 			luaArray[i].set(variable, arg);
 		}
-		#end
+		
 	}
 
 	public function triggerEventNote(eventName:String, value1:String, value2:String) {
@@ -2030,17 +2035,17 @@ class PlayState extends MusicBeatState
 
 	public function startCharacterLua(name:String)
 	{
-		#if desktop
+		
 		var doPush:Bool = false;
 		var luaFile:String = 'images/characters/jsons/' + name;
 		if (FileSystem.exists(Paths.modFolders('characters/'+name+'.lua'))){
 			luaFile = Paths.modFolders('characters/'+name+'.lua');
 			doPush = true;
 		}
-		else if(FileSystem.exists(FileSystem.absolutePath("assets/shared/"+luaFile+'.lua'))) {
+		else if(FileSystem.exists(FileSystem.absolutePath(SUtil.getPath() + "assets/shared/"+luaFile+'.lua'))) {
 			luaFile = "assets/shared/"+luaFile+'.lua';
 			doPush = true;
-		} else if (FileSystem.exists(Paths.lua2(luaFile))) {
+		} else if (FileSystem.exists(SUtil.getPath() + Paths.lua2(luaFile))) {
 			luaFile = Paths.lua2(luaFile);
 			doPush = true;
 		}
@@ -2054,7 +2059,7 @@ class PlayState extends MusicBeatState
 			}
 			luaArray.push(new ModchartState(luaFile));
 		}
-		#end
+		
 	}
 
 	public function addShaderToCamera(cam:String,effect:ShaderEffect) //STOLE FROM ANDROMEDA
@@ -3310,7 +3315,7 @@ class PlayState extends MusicBeatState
 		var songName:String = Paths.formatToSongPath(SONG.song);
 		var file:String = Paths.json(songName + '/events');
 		#if MODS_ALLOWED
-		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file)) {
+		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(SUtil.getPath() + file)) {
 		#else
 		if (OpenFlAssets.exists(file)) {
 		#end
@@ -3364,7 +3369,7 @@ class PlayState extends MusicBeatState
 				}
 			}*/
 			
-			if (FileSystem.exists(Paths.txt(songLowercase  + "/arrowSwitches" + suf)))
+			if (FileSystem.exists(SUtil.getPath() + Paths.txt(songLowercase  + "/arrowSwitches" + suf)))
 			{
 				var stuff:Array<String> = CoolUtil.coolTextFile2(Paths.txt(songLowercase  + "/arrowSwitches" + suf));
 	
@@ -3929,7 +3934,7 @@ class PlayState extends MusicBeatState
 		//because psych can run it before song starts.
 		callOnLuas('onUpdate', [elapsed]);
 		
-		#if windows
+		
 		if (songStarted && luaArray.length >= 1)
 		{
 			setOnLuas('songPos',Conductor.songPosition);
@@ -3964,7 +3969,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		#end
+		
 
 		// reverse iterate to remove oldest notes first and not invalidate the iteration
 		// stop iteration as soon as a note is not removed
@@ -4237,10 +4242,10 @@ class PlayState extends MusicBeatState
 
 			if (camFollow.x != dad.getMidpoint().x + 150 && !PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection)
 			{
-				#if windows
+				
 				if (luaArray.length >= 1)
 					callOnLuas('playerTwoTurn', []);
-				#end
+				
 
 				if (camFollowIsOn)
 				{
@@ -4249,13 +4254,13 @@ class PlayState extends MusicBeatState
 	
 					lockedCamera = false;
 
-					#if windows
+					
 					if (luaArray.length >= 1)
 					{
 						offsetX = luaArray[0].get("followDadXOffset", "float");
 						offsetY = luaArray[0].get("followDadYOffset", "float");
 					}
-					#end
+					
 
 					camFollow.setPosition(dad.getMidpoint().x + 150 + offsetX, dad.getMidpoint().y - 100 + offsetY);
 	
@@ -4272,10 +4277,10 @@ class PlayState extends MusicBeatState
 
 			if (PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection && camFollow.x != boyfriend.getMidpoint().x - 100)
 			{
-				#if windows
+				
 				if (luaArray.length >= 1)
 					callOnLuas('playerOneTurn', []);
-				#end
+				
 
 				if (camFollowIsOn)
 				{
@@ -4283,13 +4288,13 @@ class PlayState extends MusicBeatState
 					var offsetY = 0;
 					var lockedCamera:Bool = false;
 	
-					#if windows
+					
 					if (luaArray.length >= 1)
 					{
 						offsetX = luaArray[0].get("followBFXOffset", 'float');
 						offsetY = luaArray[0].get("followBFYOffset", 'float');
 					}
-					#end
+					
 	
 					camFollow.setPosition(boyfriend.getMidpoint().x - 100 + offsetX, boyfriend.getMidpoint().y - 100 + offsetY);
 	
@@ -4685,11 +4690,11 @@ class PlayState extends MusicBeatState
 				{
 					if (luaArray.length >= 1)
 					{
-						#if desktop
+						
 						var ret:Dynamic = callOnLuas('onEndSong', []);
-						#else
+						
 						var ret:Dynamic = ModchartState.Function_Continue;
-						#end
+						
 	
 						if(luaArray[0].get('endDaSong','bool') != false)
 							endSong();		
@@ -5361,14 +5366,14 @@ class PlayState extends MusicBeatState
 
 		callOnLuas("setControlsPost", []); // mainly for bonedoggle
 		
-		#if windows
+		
 		if (luaArray.length >= 1){
 		if (controls.LEFT_P){callOnLuas('keyPressed',["left"]);};
 		if (controls.DOWN_P){callOnLuas('keyPressed',["down"]);};
 		if (controls.UP_P){callOnLuas('keyPressed',["up"]);};
 		if (controls.RIGHT_P){callOnLuas('keyPressed',["right"]);};
 		};
-		#end
+		
 	
 		// Prevent player input if botplay is on
 		if(FlxG.save.data.botplay)
@@ -5684,7 +5689,7 @@ class PlayState extends MusicBeatState
 			
 			playBF = true;
 
-			#if desktop
+			
 			if (luaArray.length >= 1)
 			{
 				playBF = luaArray[0].get("playBFSing",'bool');
@@ -5698,12 +5703,12 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			#end
+			
 			
 			if (playBF)
 				char.playAnim('sing' + sDir[direction] + 'miss' + char.bfAltAnim, true);
 			
-			#if windows
+			
 			if (luaArray.length >= 1)
 			{
 				callOnLuas('playerOneMiss', [direction, Conductor.songPosition, dType]);
@@ -5713,7 +5718,7 @@ class PlayState extends MusicBeatState
 				else
 					callOnLuas('noteMissPress', [direction, dType]);
 			}
-			#end
+			
 
 			updateAccuracy();
 		}
@@ -6002,7 +6007,7 @@ class PlayState extends MusicBeatState
 
 		dad.altAnim = "";
 
-		#if windows
+		
 		if (luaArray.length >= 1)
 		{
 			if (luaArray[0].get("dadAltAnim",'bool'))
@@ -6010,7 +6015,7 @@ class PlayState extends MusicBeatState
 			else
 				dad.altAnim = "";
 		}
-		#end
+		
 
 		if (note.noteType == "Alt Animation")
 			dad.altAnim = '-alt';
@@ -6025,7 +6030,7 @@ class PlayState extends MusicBeatState
 
 		playDad = true;
 
-		#if desktop
+		
 		if (luaArray.length >= 1)
 		{
 			playDad = luaArray[0].get("playDadSing",'bool');
@@ -6039,12 +6044,12 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-		#end
+		
 
-		#if windows
+		
 		if (luaArray.length >= 1)
 			callOnLuas('dadPreNoteHit', [note.noteData, note.isSustainNote, note.noteType, note.dType]);
-		#end
+		
 
 		switch (mania)
 		{
@@ -6089,14 +6094,14 @@ class PlayState extends MusicBeatState
 		if (usesStageHx)
 			Stage.noteHit(false, notes.members.indexOf(note), Std.int(Math.abs(note.noteData)), note.isSustainNote,  note.noteType, note.dType);
 		
-		#if windows
+		
 		if (luaArray.length >= 1) //why are there three!?
 		{
 			callOnLuas('dadNoteHit', [note.noteData, note.isSustainNote, note.noteType, note.dType]);
 			callOnLuas('opponentNoteHit', [notes.members.indexOf(note), note.noteData, note.noteType, note.isSustainNote, note.dType]);
 			callOnLuas('playerTwoSing', [Math.abs(note.noteData), Conductor.songPosition]);
 		}
-		#end
+		
 
 		var time:Float = 0.15;
 		if(note.isSustainNote && !note.animation.curAnim.name.endsWith('end')) {
@@ -6186,13 +6191,13 @@ class PlayState extends MusicBeatState
 
 			char.bfAltAnim = '';
 
-			#if windows
+			
 			if (luaArray.length >= 1)
 			{
 				if (luaArray[0].get("bfAltAnim",'bool'))
 					char.bfAltAnim = '-alt';
 			}
-			#end
+			
 
 			if (note.noteType == "Alt Animation")
 				char.bfAltAnim = '-alt';
@@ -6205,7 +6210,7 @@ class PlayState extends MusicBeatState
 
 			playBF = true;	
 
-			#if desktop
+			
 			if (luaArray.length >= 1)
 			{
 				playBF = luaArray[0].get("playBFSing",'bool');
@@ -6219,12 +6224,12 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			#end
+			
 
-			#if windows
+			
 			if (luaArray.length >= 1)
 				callOnLuas('bfPreNoteHit', [note.noteData, note.isSustainNote, note.noteType, note.dType]);
-			#end
+			
 
 			var sDir:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
 
@@ -6251,10 +6256,10 @@ class PlayState extends MusicBeatState
 				bfCamY = yOff[note.noteData];
 			}*/
 				
-			#if windows
+			
 			if (luaArray.length >= 1)
 				callOnLuas('playerOneSing', [note.noteData, Conductor.songPosition]);
-			#end
+			
 
 			if(!loadRep && note.mustPress)
 				saveNotes.push(HelperFunctions.truncateFloat(note.strumTime, 2));
@@ -6282,14 +6287,14 @@ class PlayState extends MusicBeatState
 						Stage.noteHit(true, notes.members.indexOf(note), Std.int(Math.abs(note.noteData)), note.isSustainNote, note.noteType, note.dType);
 			}
 
-			#if windows
+			
 				if (luaArray.length >= 1)
 				{
 					callOnLuas('bfNoteHit', [note.noteData, note.isSustainNote, note.noteType, note.dType]);
 					callOnLuas('goodNoteHit', [notes.members.indexOf(note), note.noteData, note.noteType, note.isSustainNote, note.dType]);
 				}
 					
-			#end
+			
 			
 
 			if(FlxG.save.data.botplay) {
@@ -6645,7 +6650,7 @@ class PlayState extends MusicBeatState
 
 		if (SONG.notes[Math.floor(curStep / 16)] != null)
 		{
-			#if windows
+			
 			if (luaArray.length >= 1)
 			{
 				if (luaArray[0].get("dadAltAnim",'bool'))
@@ -6653,7 +6658,7 @@ class PlayState extends MusicBeatState
 				else
 					dad.altAnim = "";
 			}
-			#end
+			
 
 			if (SONG.notes[Math.floor(curStep / 16)].altAnim)
 				dad.altAnim = '-alt';	
@@ -6662,13 +6667,13 @@ class PlayState extends MusicBeatState
 
 		boyfriend.bfAltAnim = "";
 
-		#if windows
+		
 		if (luaArray.length >= 1)
 		{
 			if (luaArray[0].get("bfAltAnim",'bool'))
 				boyfriend.bfAltAnim = '-alt';
 		}
-		#end
+		
 
 		if (SONG.notes[Math.floor(curStep / 16)] != null)
 		{
@@ -6855,14 +6860,14 @@ class PlayState extends MusicBeatState
 				}
 			}*/
 
-		#if windows
+		
 		if (luaArray.length >= 1)
 		{
 			setOnLuas('curStep',curStep);
 			callOnLuas('stepHit',[curStep]);
 			callOnLuas('onStepHit', [curBeat]);
 		}
-		#end
+		
 
 		// yes this updates every step.
 		// yes this is bad
@@ -6896,14 +6901,14 @@ class PlayState extends MusicBeatState
 			notes.sort(FlxSort.byY, (FlxG.save.data.downscroll ? FlxSort.ASCENDING : FlxSort.DESCENDING));
 		}
 
-		#if windows
+		
 		if (luaArray.length >= 1)
 		{
 			setOnLuas('curBeat',curBeat);
 			callOnLuas('beatHit', [curBeat]);
 			callOnLuas('onBeatHit', [curBeat]);
 		}
-		#end
+		
 
 		if (SONG.notes[Math.floor(curStep / 16)] != null)
 		{
